@@ -115,11 +115,11 @@ async def test_raw_to_text_updates_buffer():
     ):
         config = MockSensorConfig()
         sensor = MockInput(config=config)
-        
+
         assert len(sensor.messages) == 0
-        
+
         await sensor.raw_to_text("Test message")
-        
+
         assert len(sensor.messages) == 1
         assert sensor.messages[0].message == "Test message"
 
@@ -133,11 +133,11 @@ async def test_raw_to_text_with_none_does_not_update_buffer():
     ):
         config = MockSensorConfig()
         sensor = MockInput(config=config)
-        
+
         assert len(sensor.messages) == 0
-        
+
         await sensor.raw_to_text(None)
-        
+
         assert len(sensor.messages) == 0
 
 
@@ -189,12 +189,12 @@ def test_formatted_latest_buffer_clears_buffer():
         config = MockSensorConfig()
         sensor = MockInput(config=config)
         sensor.io_provider = MagicMock()
-        
+
         message = Message(timestamp=time.time(), message="Test message")
         sensor.messages.append(message)
-        
+
         result = sensor.formatted_latest_buffer()
-        
+
         assert result is not None
         assert len(sensor.messages) == 0  # Buffer cleared
 
@@ -210,19 +210,19 @@ async def test_full_workflow():
         config = MockSensorConfig()
         sensor = MockInput(config=config)
         sensor.io_provider = MagicMock()
-        
+
         # Add message to buffer
         test_message = "Test workflow message"
         sensor.message_buffer.put(test_message)
-        
+
         # Poll for message
         raw_input = await sensor._poll()
         assert raw_input == test_message
-        
+
         # Convert to text
         await sensor.raw_to_text(raw_input)
         assert len(sensor.messages) == 1
-        
+
         # Format buffer
         formatted = sensor.formatted_latest_buffer()
         assert formatted is not None
@@ -239,17 +239,17 @@ def test_message_buffer_queue_operations():
     ):
         config = MockSensorConfig()
         sensor = MockInput(config=config)
-        
+
         # Test putting messages
         sensor.message_buffer.put("Message 1")
         sensor.message_buffer.put("Message 2")
-        
+
         # Test getting messages
         msg1 = sensor.message_buffer.get_nowait()
         assert msg1 == "Message 1"
-        
+
         msg2 = sensor.message_buffer.get_nowait()
         assert msg2 == "Message 2"
-        
+
         # Test empty queue
         assert sensor.message_buffer.empty()
